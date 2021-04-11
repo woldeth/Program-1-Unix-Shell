@@ -16,14 +16,17 @@ void chomp(char *s)
 
 void copy(char* org[], char* copy[]){
 
-    for(int i = 0; org[i] != '\0'; i++){
-        copy[i] = org[i];
-    }
+    memmove(copy, org, MAX_LINE / 2 + 1);
+
+    printf("done \n");
 }
 
 void clear(char* org[]){
-     for(int i = 0; org[i] != '\0'; i++){
-         org[i] = '\0';
+
+    int i = 0;
+     while(org[i] != NULL){
+         org[i] = NULL;
+         i++;
      }
 }
 
@@ -43,7 +46,6 @@ int main(int argc, char **argv)
         fflush(stdout);
 
         char input[80];
-
         fgets(input, 80, stdin);
 
         char *ptr;
@@ -56,9 +58,12 @@ int main(int argc, char **argv)
             chomp(ptr);
             args[index] = ptr;
             index = index + 1;
-            //printf("%s\n", ptr);
             ptr = strtok(NULL, " ");
         }
+
+
+
+        
         
         
         const char *e = "exit";
@@ -98,6 +103,14 @@ int main(int argc, char **argv)
                 count++;
                 copy(args, cache);
                 clear(args);
+                input[0] =0;
+
+                // int i = 0;
+                // while(input[i] != '\0'){
+                //  input[i] = '\0';
+                //     i++;
+                // }
+              
     
             }
         }
@@ -117,6 +130,13 @@ int main(int argc, char **argv)
                 count++;
                 copy(args, cache);
                 clear(args);
+
+                int i = 0;
+                while(input[i] != '\0'){
+                 input[i] = '\0';
+                    i++;
+                }
+                
 
             }
         }
