@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 
 #define MAX_LINE 80 /* The maximum length command */
 
@@ -105,7 +106,6 @@ int main()
             exit(0);
         }
      
-
         //After reading user input, the steps are:
         //(1) fork a child process using fork()
         int child = fork();
@@ -134,6 +134,7 @@ int main()
 
                 printf(" Debug \n");
             }
+    
         } else if(*args[2] == '&')
         {
             if (child == 0)
@@ -144,15 +145,50 @@ int main()
             }
             else
             {
-
                 sleep(1);
                 printf("* running concurently * \n");
                 count++;
-
             }
-        }
 
-       
+        } else if(*args[1] == '>'){
+
+            if (child == 0)
+            {
+                int fd = open(args[2], O_CREAT | O_TRUNC | O_WRONLY);
+                dup2(fd, STDOUT_FILENO);
+                args[1] = NULL;
+                args[2] = NULL;
+                close(fd);
+                execvp(args[0],args);
+
+                exit(0);
+            }
+            else
+            {
+                wait(0);
+                count++;
+            }
+
+         } else if(*args[1] == '<'){
+
+            if (child == 0)
+            {
+                int fd = open(args[2], O_RDONLY);       // file my alr
+                dup2(fd, STDIN_FILENO);
+                args[1] = NULL; 
+                args[2] = NULL;
+                close(fd);
+                execvp(args[0],args);
+
+                exit(0);
+            }
+            else
+            {
+                wait(0);
+                count++;
+            }
+            
+        }
     }
 
     return 0;
