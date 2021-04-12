@@ -14,19 +14,23 @@ void chomp(char *s)
     *s = 0;
 }
 
-void clearInput(char input []){
+void clearInput(char input[])
+{
     int index = 0;
 
-    while(index < MAX_LINE){
+    while (index < MAX_LINE)
+    {
         input[index] = '\0';
         index++;
     }
 }
 
-void initPtr(char * input[]){
-        int init = 0;
+void initPtr(char *input[])
+{
+    int init = 0;
 
-        while (init < MAX_LINE){
+    while (init < MAX_LINE / 2 + 1)
+    {
         input[init] = NULL;
         init++;
     }
@@ -34,25 +38,16 @@ void initPtr(char * input[]){
 
 int main()
 {
-    char *args[MAX_LINE]; /* command line arguments */
+    char *args[MAX_LINE / 2 + 1]; /* command line arguments */
     char cache[MAX_LINE];
 
-   // int init = 0;
-
     initPtr(args);
-
-    // while (init < MAX_LINE){
-    //     args[init] = NULL;
-    //     //cache[init] = NULL;
-    //     init++;
-    // }
 
     int should_run = 1; /* flag to determine when to exit program */
 
     int count = 0;
 
-    while (should_run)
-    {
+    while (should_run) {
 
         //PROMPT THE USER
         printf("osh> ");
@@ -61,67 +56,55 @@ int main()
         // TAKE INPUT
         char input[MAX_LINE];
         fgets(input, MAX_LINE, stdin);
-        char *ptr;
-        ptr = strtok(input, " ");
 
-        // FORMAT INPUT TO CLEAR STRINGS
-        int index = 0;
-        while (ptr != NULL)
-        {
-            chomp(ptr);
-            args[index] = ptr;
-            index = index + 1;
-            ptr = strtok(NULL, " ");
+        if (input[0] != '!' && input[1] != '!') {
+
+            memcpy(cache, input, 80);
+
+            char *ptr;
+            ptr = strtok(input, " ");
+
+            // FORMAT INPUT TO CLEAR STRINGS
+            int index = 0;
+            while (ptr != NULL)
+            {
+                chomp(ptr);
+                args[index] = ptr;
+                index = index + 1;
+                ptr = strtok(NULL, " ");
+            }
+
+        } else if(input[0] == '!' && input[1] == '!' && count > 0){
+            memcpy(input, cache, 80);
+
+             // FORMAT INPUT TO CLEAR STRINGS
+            char *ptr;
+            ptr = strtok(input, " ");
+            int index = 0;
+            while (ptr != NULL)
+            {
+                chomp(ptr);
+                args[index] = ptr;
+                index = index + 1;
+                ptr = strtok(NULL, " ");
+            }
+
+        } else if(input[0] == '!' && input[1] == '!' && count == 0){
+            printf("ERROR -> YOU CAN NOT REPEAT COMMAND ON FIRST TRY");
+            should_run = 0;
+            exit(0);
         }
 
-        // DETERMINE IF EXIT COMMAND OR REPEAT COMMAND 
+        // DETERMINE IF EXIT COMMAND OR REPEAT COMMAND
         const char *e = "exit";
-        const char *repeat = "!!";
+        //const char *repeat = "!!";
+
         if (strcmp(args[0], e) == 0)
         {
             should_run = 0;
             exit(0);
         }
-        else if (strcmp(args[0], repeat) == 0)
-        {
-            printf("repeat the process \n");
-            if (count == 0)
-            {
-                printf("ERROR -> You can not repeat command on first try");
-                should_run = 0;
-                exit(0);
-            }
-            else
-            {
-                printf("PEFORM LAST COMMAND \n");
-
-                // if input == !! 
-
-                // clear the input 
-                clearInput(input);
-                
-                // clear args
-                initPtr(args);
-
-                char *ptr1;
-                ptr1 = strtok(cache, " ");
-
-                // FORMAT INPUT TO CLEAR STRINGS
-                int index1 = 0;
-                while (ptr1 != NULL)
-                {
-                    chomp(ptr1);
-                    args[index] = ptr1;
-                    index1 = index1 + 1;
-                    ptr1 = strtok(NULL, " ");
-                }
-
-                should_run = 0;
-
-                print("stop here");
-                exit(0);
-            }
-        }
+     
 
         //After reading user input, the steps are:
         //(1) fork a child process using fork()
@@ -143,17 +126,16 @@ int main()
                 printf("* parent waited * \n");
                 count++;
 
-                memcpy(cache, input, 80);
-
                 // clear the input
                 clearInput(input);
 
                 // clear the args;
                 initPtr(args);
-                
+
                 printf(" Debug \n");
             }
         }
+
         // else if(*args[2] == '&')
         // {
         //     if (child == 0)
@@ -172,7 +154,7 @@ int main()
         //     }
         // }
 
-       // printf(" ");
+        // printf(" ");
     }
 
     return 0;
