@@ -173,7 +173,7 @@ int main()
 
             if (child == 0)
             {
-                int fd = open(args[2], O_RDONLY);       // file my alr
+                int fd = open(args[2], O_RDONLY);       // file must be there already
                 dup2(fd, STDIN_FILENO);
                 args[1] = NULL; 
                 args[2] = NULL;
