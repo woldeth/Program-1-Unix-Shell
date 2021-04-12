@@ -14,9 +14,38 @@ void chomp(char *s)
     *s = 0;
 }
 
+void clearInput(char input []){
+    int index = 0;
+
+    while(index < MAX_LINE){
+        input[index] = '\0';
+        index++;
+    }
+}
+
+void initPtr(char * input[]){
+        int init = 0;
+
+        while (init < MAX_LINE){
+        input[init] = NULL;
+        init++;
+    }
+}
+
 int main()
 {
     char *args[MAX_LINE]; /* command line arguments */
+    char cache[MAX_LINE];
+
+   // int init = 0;
+
+    initPtr(args);
+
+    // while (init < MAX_LINE){
+    //     args[init] = NULL;
+    //     //cache[init] = NULL;
+    //     init++;
+    // }
 
     int should_run = 1; /* flag to determine when to exit program */
 
@@ -30,8 +59,8 @@ int main()
         fflush(stdout);
 
         // TAKE INPUT
-        char input[80];
-        fgets(input, 80, stdin);
+        char input[MAX_LINE];
+        fgets(input, MAX_LINE, stdin);
         char *ptr;
         ptr = strtok(input, " ");
 
@@ -51,7 +80,7 @@ int main()
         if (strcmp(args[0], e) == 0)
         {
             should_run = 0;
-            continue;
+            exit(0);
         }
         else if (strcmp(args[0], repeat) == 0)
         {
@@ -60,13 +89,37 @@ int main()
             {
                 printf("ERROR -> You can not repeat command on first try");
                 should_run = 0;
-                continue;
+                exit(0);
             }
             else
             {
                 printf("PEFORM LAST COMMAND \n");
+
+                // if input == !! 
+
+                // clear the input 
+                clearInput(input);
+                
+                // clear args
+                initPtr(args);
+
+                char *ptr1;
+                ptr1 = strtok(cache, " ");
+
+                // FORMAT INPUT TO CLEAR STRINGS
+                int index1 = 0;
+                while (ptr1 != NULL)
+                {
+                    chomp(ptr1);
+                    args[index] = ptr1;
+                    index1 = index1 + 1;
+                    ptr1 = strtok(NULL, " ");
+                }
+
                 should_run = 0;
-                continue;
+
+                print("stop here");
+                exit(0);
             }
         }
 
@@ -89,6 +142,16 @@ int main()
                 wait(0); // parent waits
                 printf("* parent waited * \n");
                 count++;
+
+                memcpy(cache, input, 80);
+
+                // clear the input
+                clearInput(input);
+
+                // clear the args;
+                initPtr(args);
+                
+                printf(" Debug \n");
             }
         }
         // else if(*args[2] == '&')
@@ -109,7 +172,7 @@ int main()
         //     }
         // }
 
-        //printf("debug");
+       // printf(" ");
     }
 
     return 0;
