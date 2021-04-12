@@ -155,6 +155,13 @@ int main()
                 //sleep(1);
                 //printf("* running concurently * \n");
                 count++;
+
+                // clear the input
+                clearInput(input);
+
+                // clear the args;
+                initPtr(args);
+
             }
         }
         else if (*args[1] == '>')
@@ -175,6 +182,12 @@ int main()
             {
                 wait(0);
                 count++;
+
+                // clear the input
+                clearInput(input);
+
+                // clear the args;
+                initPtr(args);
             }
         }
         else if (*args[1] == '<')
@@ -195,36 +208,72 @@ int main()
             {
                 wait(0);
                 count++;
+
+                // clear the input
+                clearInput(input);
+
+                // clear the args;
+                initPtr(args);
             }
         }
         else if (*args[1] == '|')
             {
+                if(child != 0){
+                    close(pipeFD[0]);
+                    close(pipeFD[1]);
+                }
 
                 if (child == 0)
                 {
-                    printf("PIPE!!!! \n");
+                    int grandChild = fork();
+
+                    if(grandChild == 0){    // child
+                        close(pipeFD[0]);  // close the read side
+                        dup2(pipeFD[1], STDOUT_FILENO);    
+                        execlp(args[0], args[0], (char *) NULL);
+
+                    }else { // grand child
+                        wait(0);
+                        close(pipeFD[1]); // close the write side of the pipe for grand child
+                        dup2(pipeFD[0], STDIN_FILENO);  
+                        execlp(args[2], args[2], (char*) NULL); 
+                    }
+                        
                     exit(0);
                 }
                 else
                 {
                     wait(0);
                     count++;
+
+                    // clear the input
+                    clearInput(input);
+
+                    // clear the args;
+                    initPtr(args);
                 }
 
-         } else if (*args[2] == '|') 
-            {
-
-                if (child == 0)
-                {
-                    printf("PIPE!!!! \n");
-                    exit(0);
-                }
-                else
-                {
-                    wait(0);
-                    count++;
-                }
             }
+        //   else if (*args[2] == '|') 
+        //     {
+
+        //         if (child == 0)
+        //         {
+        //             printf("PIPE!!!! \n");
+        //             exit(0);
+        //         }
+        //         else
+        //         {
+        //             wait(0);
+        //             count++;
+
+        //         // clear the input
+        //         clearInput(input);
+
+        //         // clear the args;
+        //         initPtr(args);
+        //         }
+        //     }
     
         }
 
