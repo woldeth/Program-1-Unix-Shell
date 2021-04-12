@@ -134,27 +134,25 @@ int main()
 
                 printf(" Debug \n");
             }
+        } else if(*args[2] == '&')
+        {
+            if (child == 0)
+            {
+                args[2] = NULL;
+                execvp(args[0], args); // child process performs the command
+                exit(0);
+            }
+            else
+            {
+
+                sleep(1);
+                printf("* running concurently * \n");
+                count++;
+
+            }
         }
 
-        // else if(*args[2] == '&')
-        // {
-        //     if (child == 0)
-        //     {
-        //         args[2] = NULL;
-        //         execvp(args[0], args); // child process performs the command
-        //         exit(0);
-        //     }
-        //     else
-        //     {
-
-        //         sleep(1);
-        //         printf("* running concurently * \n");
-        //         count++;
-
-        //     }
-        // }
-
-        // printf(" ");
+       
     }
 
     return 0;
