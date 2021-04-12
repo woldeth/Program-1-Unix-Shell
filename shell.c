@@ -48,7 +48,8 @@ int main()
 
     int count = 0;
 
-    while (should_run) {
+    while (should_run)
+    {
 
         //PROMPT THE USER
         printf("osh> ");
@@ -58,7 +59,8 @@ int main()
         char input[MAX_LINE];
         fgets(input, MAX_LINE, stdin);
 
-        if (input[0] != '!' && input[1] != '!') {
+        if (input[0] != '!' && input[1] != '!')
+        {
 
             memcpy(cache, input, 80);
 
@@ -74,11 +76,12 @@ int main()
                 index = index + 1;
                 ptr = strtok(NULL, " ");
             }
-
-        } else if(input[0] == '!' && input[1] == '!' && count > 0){
+        }
+        else if (input[0] == '!' && input[1] == '!' && count > 0)
+        {
             memcpy(input, cache, 80);
 
-             // FORMAT INPUT TO CLEAR STRINGS
+            // FORMAT INPUT TO CLEAR STRINGS
             char *ptr;
             ptr = strtok(input, " ");
             int index = 0;
@@ -89,8 +92,9 @@ int main()
                 index = index + 1;
                 ptr = strtok(NULL, " ");
             }
-
-        } else if(input[0] == '!' && input[1] == '!' && count == 0){
+        }
+        else if (input[0] == '!' && input[1] == '!' && count == 0)
+        {
             printf("ERROR -> YOU CAN NOT REPEAT COMMAND ON FIRST TRY");
             should_run = 0;
             exit(0);
@@ -105,7 +109,10 @@ int main()
             should_run = 0;
             exit(0);
         }
-     
+
+        int pipeFD[2];
+        pipe(pipeFD);
+
         //After reading user input, the steps are:
         //(1) fork a child process using fork()
         int child = fork();
@@ -123,7 +130,7 @@ int main()
             {
                 //(3) parent will invoke wait() unless command included &
                 wait(0); // parent waits
-                printf("* parent waited * \n");
+                //printf("* parent waited * \n");
                 count++;
 
                 // clear the input
@@ -132,10 +139,10 @@ int main()
                 // clear the args;
                 initPtr(args);
 
-                printf(" Debug \n");
+                //printf(" Debug \n");
             }
-    
-        } else if(*args[2] == '&')
+        }
+        else if (*args[2] == '&')
         {
             if (child == 0)
             {
@@ -145,12 +152,13 @@ int main()
             }
             else
             {
-                sleep(1);
-                printf("* running concurently * \n");
+                //sleep(1);
+                //printf("* running concurently * \n");
                 count++;
             }
-
-        } else if(*args[1] == '>'){
+        }
+        else if (*args[1] == '>')
+        {
 
             if (child == 0)
             {
@@ -159,7 +167,7 @@ int main()
                 args[1] = NULL;
                 args[2] = NULL;
                 close(fd);
-                execvp(args[0],args);
+                execvp(args[0], args);
 
                 exit(0);
             }
@@ -168,17 +176,18 @@ int main()
                 wait(0);
                 count++;
             }
-
-         } else if(*args[1] == '<'){
+        }
+        else if (*args[1] == '<')
+        {
 
             if (child == 0)
             {
-                int fd = open(args[2], O_RDONLY);       // file must be there already
+                int fd = open(args[2], O_RDONLY); // file must be there already
                 dup2(fd, STDIN_FILENO);
-                args[1] = NULL; 
+                args[1] = NULL;
                 args[2] = NULL;
                 close(fd);
-                execvp(args[0],args);
+                execvp(args[0], args);
 
                 exit(0);
             }
@@ -187,9 +196,37 @@ int main()
                 wait(0);
                 count++;
             }
-            
         }
-    }
+        else if (*args[1] == '|')
+            {
+
+                if (child == 0)
+                {
+                    printf("PIPE!!!! \n");
+                    exit(0);
+                }
+                else
+                {
+                    wait(0);
+                    count++;
+                }
+
+         } else if (*args[2] == '|') 
+            {
+
+                if (child == 0)
+                {
+                    printf("PIPE!!!! \n");
+                    exit(0);
+                }
+                else
+                {
+                    wait(0);
+                    count++;
+                }
+            }
+    
+        }
 
     return 0;
 }
