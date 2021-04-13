@@ -50,7 +50,6 @@ int main()
 
     while (should_run)
     {
-
         //PROMPT THE USER
         printf("osh> ");
         fflush(stdout);
@@ -113,13 +112,20 @@ int main()
         int pipeFD[2];
         pipe(pipeFD);
 
+         //printf("CHECK DEBUGGER");
+        if(cache[0] == '\n'){
+            cache[0] = '\0';
+           // printf("EXTRA ENTER CAPTURED AFTER & \n");
+            continue;
+        }
+
         //After reading user input, the steps are:
         //(1) fork a child process using fork()
         int child = fork();
 
         //(2) the child process will invoke execvp()
 
-        if (args[2] == NULL) // NO VALUE IN THIRD POSITION
+        if ((args[1] == NULL && args[2] == NULL) || (args[1] == NULL && *args[1] != '&')) // NO VALUE IN THIRD POSITION
         {
             if (child == 0)
             {
@@ -141,6 +147,29 @@ int main()
 
                 //printf(" Debug \n");
             }
+        }else if(*args[1] == '&') {
+
+            if (child == 0)
+            {
+                //args[1] = NULL;
+                //execvp(args[0], args); // child process performs the command
+                execlp(args[0], args[0], (char *)NULL);
+                exit(0);
+            }
+            else
+            {
+                //sleep(1);
+                //printf("* running concurently * \n");
+                count++;
+
+                // clear the input
+                clearInput(input);
+
+                // clear the args;
+                initPtr(args);
+                
+            }
+
         }
         else if (*args[2] == '&')
         {
@@ -188,7 +217,9 @@ int main()
                 // clear the args;
                 initPtr(args);
             }
-        }else if(*args[2] == '>') {  // CURRENTLY WORKING ON THIS
+        }
+        else if (*args[2] == '>')
+        { 
 
             if (child == 0)
             {
@@ -212,8 +243,6 @@ int main()
                 // clear the args;
                 initPtr(args);
             }
-
-
         }
         else if (*args[1] == '<')
         {
@@ -242,86 +271,91 @@ int main()
             }
         }
         else if (*args[1] == '|')
+        {
+            if (child != 0)
             {
-                if(child != 0){
-                    close(pipeFD[0]);
-                    close(pipeFD[1]);
-                }
-
-                if (child == 0)
-                {
-                    int grandChild = fork();
-
-                    if(grandChild == 0){    // child
-                        close(pipeFD[0]);  // close the read side
-                        dup2(pipeFD[1], STDOUT_FILENO);    
-                        execlp(args[0], args[0], (char *) NULL);
-
-                    }else { // grand child
-                        wait(0);
-                        close(pipeFD[1]); // close the write side of the pipe for grand child
-                        dup2(pipeFD[0], STDIN_FILENO);  
-                        execlp(args[2], args[2], (char*) NULL); 
-                    }
-                        
-                    exit(0);
-                }
-                else
-                {
-                    wait(0);
-                    count++;
-
-                    // clear the input
-                    clearInput(input);
-
-                    // clear the args;
-                    initPtr(args);
-                }
-
-            } else if (*args[2] == '|') 
-            {
-                if(child != 0){
-                    close(pipeFD[0]);
-                    close(pipeFD[1]);
-                }
-
-                if (child == 0)
-                {
-                    int grandChild = fork();
-
-                    if(grandChild == 0){    // child
-                        close(pipeFD[0]);  // close the read side
-                        dup2(pipeFD[1], STDOUT_FILENO);
-                        args[2] = NULL;
-                        execvp(args[0], args);
-                        //execlp(args[0], args[0], (char *) NULL);
-
-                    }else { // grand child
-                        wait(0);
-                        //char buff[4096];
-                        //int n = read(pipeFD[0], buff, 4096);
-                        //printf("%s", buff);
-                        close(pipeFD[1]); // close the write side of the pipe for grand child
-                        dup2(pipeFD[0], STDIN_FILENO);  
-                        execlp(args[3], args[3], (char*) NULL); 
-                    }
-                        
-                    exit(0);
-                }
-                else
-                {
-                    wait(0);
-                    count++;
-
-                    // clear the input
-                    clearInput(input);
-
-                    // clear the args;
-                    initPtr(args);
-                }
+                close(pipeFD[0]);
+                close(pipeFD[1]);
             }
-    
+
+            if (child == 0)
+            {
+                int grandChild = fork();
+
+                if (grandChild == 0)
+                {                     // child
+                    close(pipeFD[0]); // close the read side
+                    dup2(pipeFD[1], STDOUT_FILENO);
+                    execlp(args[0], args[0], (char *)NULL);
+                }
+                else
+                { // grand child
+                    wait(0);
+                    close(pipeFD[1]); // close the write side of the pipe for grand child
+                    dup2(pipeFD[0], STDIN_FILENO);
+                    execlp(args[2], args[2], (char *)NULL);
+                }
+
+                exit(0);
+            }
+            else
+            {
+                wait(0);
+                count++;
+
+                // clear the input
+                clearInput(input);
+
+                // clear the args;
+                initPtr(args);
+            }
         }
+        else if (*args[2] == '|')
+        {
+            if (child != 0)
+            {
+                close(pipeFD[0]);
+                close(pipeFD[1]);
+            }
+
+            if (child == 0)
+            {
+                int grandChild = fork();
+
+                if (grandChild == 0)
+                {                     // child
+                    close(pipeFD[0]); // close the read side
+                    dup2(pipeFD[1], STDOUT_FILENO);
+                    args[2] = NULL;
+                    execvp(args[0], args);
+                    //execlp(args[0], args[0], (char *) NULL);
+                }
+                else
+                { // grand child
+                    wait(0);
+                    //char buff[4096];
+                    //int n = read(pipeFD[0], buff, 4096);
+                    //printf("%s", buff);
+                    close(pipeFD[1]); // close the write side of the pipe for grand child
+                    dup2(pipeFD[0], STDIN_FILENO);
+                    execlp(args[3], args[3], (char *)NULL);
+                }
+
+                exit(0);
+            }
+            else
+            {
+                wait(0);
+                count++;
+
+                // clear the input
+                clearInput(input);
+
+                // clear the args;
+                initPtr(args);
+            }
+        }
+    }
 
     return 0;
 }
