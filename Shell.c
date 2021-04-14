@@ -135,7 +135,7 @@ int main()
 
         // DETERMINE IF EXIT COMMAND OR REPEAT COMMAND
         const char *e = "exit";
-        //const char *repeat = "!!";
+     
 
         if (strcmp(args[0], e) == 0)
         {
@@ -146,10 +146,9 @@ int main()
         int pipeFD[2];
         pipe(pipeFD);
 
-         //printf("CHECK DEBUGGER");
+
         if(cache[0] == '\n'){
             cache[0] = '\0';
-           // printf("EXTRA ENTER CAPTURED AFTER & \n");
             continue;
         }
 
