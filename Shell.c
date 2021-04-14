@@ -1,3 +1,16 @@
+// ------------------------------------------------------------------------
+// Name: Tomas H Woldemichael
+// Date: April 13th, 2021
+// File Name: Shell.c
+// Title: PROGRAM 1
+// -------------------------------------------------------------------------
+// This code is the main file for the shell. This program replicates the 
+// terminal shell exi
+// 
+//
+//---------------------------------------------------------------------------
+
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -57,6 +70,14 @@ int main()
         // TAKE INPUT
         char input[MAX_LINE];
         fgets(input, MAX_LINE, stdin);
+
+        if (input[0] == '\n'){
+            // do something with cache
+            continue;
+        }
+
+
+        printf(" ");
 
         if (input[0] != '!' && input[1] != '!')
         {
@@ -161,10 +182,8 @@ int main()
                 //sleep(1);
                 //printf("* running concurently * \n");
                 count++;
-
                 // clear the input
                 clearInput(input);
-
                 // clear the args;
                 initPtr(args);
                 
@@ -268,8 +287,8 @@ int main()
 
                 // clear the args;
                 initPtr(args);
-            }
-        }
+            }       // 0  1  2  3
+        }           // ls | wc -l  or ls | wc 
         else if (*args[1] == '|')
         {
             if (child != 0)
@@ -286,14 +305,30 @@ int main()
                 {                     // child
                     close(pipeFD[0]); // close the read side
                     dup2(pipeFD[1], STDOUT_FILENO);
-                    execlp(args[0], args[0], (char *)NULL);
+                    
+                    args[1] = NULL;
+                    execvp(args[0], args);
+                    
                 }
                 else
                 { // grand child
                     wait(0);
                     close(pipeFD[1]); // close the write side of the pipe for grand child
                     dup2(pipeFD[0], STDIN_FILENO);
-                    execlp(args[2], args[2], (char *)NULL);
+
+                    char *args1[MAX_LINE];
+
+                    int z = 2;
+                    int index = 0;
+
+                    while(args[z] != NULL){
+                        args1[index] = args[z];
+                        index++;
+                        z++;
+                    }
+
+                    args1[index] = NULL;
+                    execvp(args[2], args1);
                 }
 
                 exit(0);
@@ -309,7 +344,7 @@ int main()
                 // clear the args;
                 initPtr(args);
             }
-        }
+        }       // ls -l| wc  or ls -l | wc -l
         else if (*args[2] == '|')
         {
             if (child != 0)
@@ -326,9 +361,9 @@ int main()
                 {                     // child
                     close(pipeFD[0]); // close the read side
                     dup2(pipeFD[1], STDOUT_FILENO);
-                    args[2] = NULL;
-                    execvp(args[0], args);
-                    //execlp(args[0], args[0], (char *) NULL);
+                    //args[2] = NULL;
+                    execlp(args[0], args[0], (char *) NULL);
+                    //execvp(args[0], args);
                 }
                 else
                 { // grand child
@@ -339,6 +374,9 @@ int main()
                     close(pipeFD[1]); // close the write side of the pipe for grand child
                     dup2(pipeFD[0], STDIN_FILENO);
                     execlp(args[3], args[3], (char *)NULL);
+                    //execvp(args[3], args);
+
+                    // DEAL WITH 2 ON RIGHT 
                 }
 
                 exit(0);
