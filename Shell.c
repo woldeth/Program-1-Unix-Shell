@@ -24,7 +24,8 @@
 
 //void chomp()
 // Cleans the input chars of the users input in the terminals
-// Passed in a pointer to a string of characters to be modified 
+// Precondition:
+// Postcondition:
 void chomp(char *s)
 {
     while (*s && *s != '\n' && *s != '\r'){
@@ -35,8 +36,9 @@ void chomp(char *s)
 }
 
 //void clearInput()
-// Cleans the input chars of the users input in the terminals
-// Passed in a pointer to a string of characters to be modified 
+// Clears the input character array for the next input
+// Precondition:
+// Postcondition:
 void clearInput(char input[])
 {
     int index = 0;
@@ -48,6 +50,10 @@ void clearInput(char input[])
     }
 }
 
+//void initPtr()
+// Clears the input character array for the next input
+// Precondition:
+// Postcondition:
 void initPtr(char *input[])
 {
     int init = 0;
@@ -152,7 +158,7 @@ int main()
 
         //(2) the child process will invoke execvp()
 
-        if ((args[1] == NULL && args[2] == NULL) || (args[1] == NULL && *args[1] != '&')) // NO VALUE IN THIRD POSITION
+        if ((args[1] == NULL && args[2] == NULL)) //|| (args[1] == NULL && *args[2] != '&')) // NO VALUE IN THIRD POSITION
         {
             if (child == 0)
             {
@@ -165,16 +171,15 @@ int main()
                 wait(0); // parent waits
                 //printf("* parent waited * \n");
                 count++;
-
                 // clear the input
                 clearInput(input);
-
                 // clear the args;
                 initPtr(args);
 
-                //printf(" Debug \n");
             }
-        }else if(*args[1] == '&') {
+
+        }
+        else if(*args[1] == '&') {
 
             if (child == 0)
             {
@@ -185,10 +190,9 @@ int main()
             }
             else
             {
-                //printf("*** Not waiting **");
-                //sleep(1);
-                //printf("* running concurently * \n");
+
                 count++;
+
                 // clear the input
                 clearInput(input);
                 // clear the args;
@@ -207,13 +211,11 @@ int main()
             }
             else
             {
-                //sleep(1);
-                //printf("* running concurently * \n");
+
                 count++;
 
                 // clear the input
                 clearInput(input);
-
                 // clear the args;
                 initPtr(args);
 
@@ -237,9 +239,9 @@ int main()
             {
                 wait(0);
                 count++;
+
                 // clear the input
                 clearInput(input);
-
                 // clear the args;
                 initPtr(args);
             }
@@ -265,7 +267,6 @@ int main()
 
                 // clear the input
                 clearInput(input);
-
                 // clear the args;
                 initPtr(args);
             }
@@ -318,7 +319,7 @@ int main()
                     
                 }
                 else
-                { // grand child
+                { 
                     wait(0);
                     close(pipeFD[1]); // close the write side of the pipe for grand child
                     dup2(pipeFD[0], STDIN_FILENO);
@@ -409,7 +410,7 @@ int main()
                 initPtr(args);
             }
         }
+    
     }
-
     return 0;
 }
