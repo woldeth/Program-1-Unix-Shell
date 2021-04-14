@@ -24,8 +24,8 @@
 
 //void chomp()
 // Cleans the input chars of the users input in the terminals
-// Precondition:
-// Postcondition:
+// Precondition: A pointer to a string is passed in
+// Postcondition: The string is properly formated for use
 void chomp(char *s)
 {
     while (*s && *s != '\n' && *s != '\r'){
@@ -37,8 +37,8 @@ void chomp(char *s)
 
 //void clearInput()
 // Clears the input character array for the next input
-// Precondition:
-// Postcondition:
+// Precondition: None
+// Postcondition: Clears the input character array for next input
 void clearInput(char input[])
 {
     int index = 0;
@@ -52,8 +52,8 @@ void clearInput(char input[])
 
 //void initPtr()
 // Clears the input character array for the next input
-// Precondition:
-// Postcondition:
+// Precondition: None:
+// Postcondition: Clears all pointer characters in array
 void initPtr(char *input[])
 {
     int init = 0;
@@ -247,7 +247,8 @@ int main()
 
             if (child == 0)
             {
-                int fd = open(args[2], O_CREAT | O_TRUNC | O_WRONLY);
+                //O_RDONLY | O_WRONLY | O_CREAT, 0666
+                int fd = open(args[2], O_CREAT | O_TRUNC | O_WRONLY, 0666);
                 dup2(fd, STDOUT_FILENO);
                 args[1] = NULL;
                 args[2] = NULL;
@@ -272,7 +273,7 @@ int main()
 
             if (child == 0)
             {
-                int fd = open(args[3], O_CREAT | O_TRUNC | O_WRONLY);
+                int fd = open(args[3], O_CREAT | O_TRUNC | O_WRONLY, 0666);
                 dup2(fd, STDOUT_FILENO);
 
                 args[2] = NULL;
@@ -297,10 +298,10 @@ int main()
 
             if (child == 0)
             {
-                int fd = open(args[2], O_RDONLY); // file must be there already
+                int fd = open(args[2], O_RDONLY | O_CREAT); // file must be there already
                 dup2(fd, STDIN_FILENO);
                 args[1] = NULL;
-                args[2] = NULL;
+                //args[2] = NULL;
                 close(fd);
                 execvp(args[0], args);
 
