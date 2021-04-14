@@ -69,6 +69,7 @@ int main()
 {
     char *args[MAX_LINE / 2 + 1]; /* command line arguments */
     char cache[MAX_LINE];
+    char commands[4] = {'&','<', '>','|'};
 
     initPtr(args);
 
@@ -158,8 +159,28 @@ int main()
 
         //(2) the child process will invoke execvp()
 
-        if ((args[1] == NULL && args[2] == NULL)) //|| (args[1] == NULL && *args[2] != '&')) // NO VALUE IN THIRD POSITION
-        {
+        int flag = 0;
+        int c = 0;
+
+       
+            for(int i = 0; i < 4; i++){
+                for(int j = 0; j < MAX_LINE / 2 + 1; j++){
+
+                    if(args[j] != NULL){
+                        if(commands[i] == *args[j]) {
+                            flag = 1;
+                        }
+                    } else{
+                        break;
+                    }
+                }
+
+            }
+    
+
+
+
+        if (flag == 0) {
             if (child == 0)
             {
                 execvp(args[0], args); // child process performs the command
@@ -410,7 +431,8 @@ int main()
                 initPtr(args);
             }
         }
-    
-    }
+
+        }
+
     return 0;
 }
