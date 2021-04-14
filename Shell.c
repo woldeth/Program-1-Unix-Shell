@@ -5,8 +5,11 @@
 // Title: PROGRAM 1
 // -------------------------------------------------------------------------
 // This code is the main file for the shell. This program replicates the 
-// terminal shell exi
+// terminal shell.
 // 
+// Assumptions:
+//      - All commands must have spaces between them 
+//      - No spaces at the end of the command promt
 //
 //---------------------------------------------------------------------------
 
@@ -19,15 +22,21 @@
 
 #define MAX_LINE 80 /* The maximum length command */
 
-// gets rid of \n at the end of the function
+//void chomp()
+// Cleans the input chars of the users input in the terminals
+// Passed in a pointer to a string of characters to be modified 
 void chomp(char *s)
 {
-    while (*s && *s != '\n' && *s != '\r')
+    while (*s && *s != '\n' && *s != '\r'){
         s++;
-
+    }
+        
     *s = 0;
 }
 
+//void clearInput()
+// Cleans the input chars of the users input in the terminals
+// Passed in a pointer to a string of characters to be modified 
 void clearInput(char input[])
 {
     int index = 0;
@@ -72,12 +81,9 @@ int main()
         fgets(input, MAX_LINE, stdin);
 
         if (input[0] == '\n'){
-            // do something with cache
+            wait(0);
             continue;
         }
-
-
-        printf(" ");
 
         if (input[0] != '!' && input[1] != '!')
         {
@@ -172,13 +178,14 @@ int main()
 
             if (child == 0)
             {
-                //args[1] = NULL;
-                //execvp(args[0], args); // child process performs the command
-                execlp(args[0], args[0], (char *)NULL);
+                args[1] = NULL;
+                execvp(args[0], args); // child process performs the command
+                
                 exit(0);
             }
             else
             {
+                //printf("*** Not waiting **");
                 //sleep(1);
                 //printf("* running concurently * \n");
                 count++;
@@ -287,8 +294,8 @@ int main()
 
                 // clear the args;
                 initPtr(args);
-            }       // 0  1  2  3
-        }           // ls | wc -l  or ls | wc 
+            }     
+        }           
         else if (*args[1] == '|')
         {
             if (child != 0)
@@ -305,7 +312,7 @@ int main()
                 {                     // child
                     close(pipeFD[0]); // close the read side
                     dup2(pipeFD[1], STDOUT_FILENO);
-                    
+
                     args[1] = NULL;
                     execvp(args[0], args);
                     
@@ -344,7 +351,7 @@ int main()
                 // clear the args;
                 initPtr(args);
             }
-        }       // ls -l| wc  or ls -l | wc -l
+        }       
         else if (*args[2] == '|')
         {
             if (child != 0)
@@ -361,22 +368,31 @@ int main()
                 {                     // child
                     close(pipeFD[0]); // close the read side
                     dup2(pipeFD[1], STDOUT_FILENO);
-                    //args[2] = NULL;
-                    execlp(args[0], args[0], (char *) NULL);
-                    //execvp(args[0], args);
+                    args[2] = NULL;
+
+                    execvp(args[0], args);
                 }
                 else
                 { // grand child
                     wait(0);
-                    //char buff[4096];
-                    //int n = read(pipeFD[0], buff, 4096);
-                    //printf("%s", buff);
+ 
                     close(pipeFD[1]); // close the write side of the pipe for grand child
                     dup2(pipeFD[0], STDIN_FILENO);
-                    execlp(args[3], args[3], (char *)NULL);
-                    //execvp(args[3], args);
+    
 
-                    // DEAL WITH 2 ON RIGHT 
+                    char *args1[MAX_LINE];
+
+                    int z = 3;
+                    int index = 0;
+
+                    while(args[z] != NULL){
+                        args1[index] = args[z];
+                        index++;
+                        z++;
+                    }
+
+                    args1[index] = NULL;
+                    execvp(args[3], args1);
                 }
 
                 exit(0);
