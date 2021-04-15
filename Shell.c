@@ -297,7 +297,7 @@ int main()
 
             if (child == 0)
             {
-                int fd = open(args[2], O_RDONLY | O_CREAT); // file must be there already
+                int fd = open(args[2], O_RDONLY); // file must be there already
                 dup2(fd, STDIN_FILENO);
                 args[1] = NULL;
                 //args[2] = NULL;
@@ -317,7 +317,32 @@ int main()
                 // clear the args;
                 initPtr(args);
             }     
-        }           
+        } else if(*args[2] == '<'){
+                        if (child == 0)
+            {
+                int fd = open(args[3], O_RDONLY); // file must be there already
+                dup2(fd, STDIN_FILENO);
+                args[2] = NULL;
+                close(fd);
+                execvp(args[0], args);
+
+                exit(0);
+            }
+            else
+            {
+                wait(0);
+                count++;
+
+                // clear the input
+                clearInput(input);
+
+                // clear the args;
+                initPtr(args);
+            }     
+
+
+
+        }          
         else if (*args[1] == '|')
         {
             if (child != 0)

@@ -1,7 +1,7 @@
 total 56
--rwxrwxr-x 1 woldeth woldeth 13000 Apr 14 16:06 a.out
--rw-rw-r-- 1 woldeth woldeth     0 Apr 14 16:08 junk.txt
+-rwxrwxr-x 1 woldeth woldeth 13000 Apr 14 18:32 a.out
+-rw-rw-r-- 1 woldeth woldeth     0 Apr 14 18:40 junk.txt
 -rw-rw-r-- 1 woldeth woldeth    60 Apr 10 17:43 prog.c
 -rw-rw-r-- 1 woldeth woldeth    22 Apr 10 15:45 README.md
 -rwxrwxr-x 1 woldeth woldeth 17992 Apr 13 19:14 Shell
--rw-rw-r-- 1 woldeth woldeth 10496 Apr 14 16:06 Shell.c
+-rw-rw-r-- 1 woldeth woldeth 10545 Apr 14 16:20 Shell.c
